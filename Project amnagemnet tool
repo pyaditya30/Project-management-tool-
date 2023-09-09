@@ -1,0 +1,45 @@
+from flask import Flask, request, jsonify
+
+app = Flask(__name__)
+
+# Initialize an empty list to store projects
+projects = []
+
+@app.route("/projects", methods=["GET"])
+def get_projects():
+    return jsonify(projects)
+
+@app.route("/projects/<int:project_id>", methods=["GET"])
+def get_project(project_id):
+    if project_id >= 0 and project_id < len(projects):
+        return jsonify(projects[project_id])
+    else:
+        return "Project not found", 404
+
+@app.route("/projects", methods=["POST"])
+def create_project():
+    data = request.json
+    if "title" in data and "description" in data:
+        new_project = {"title": data["title"], "description": data["description"]}
+        projects.append(new_project)
+        return jsonify({"message": "Project created successfully"}), 201
+    else:
+        return "Invalid request data", 400
+
+@app.route("/projects/<int:project_id>", methods=["PUT"])
+def update_project(project_id):
+    if project_id >= 0 and project_id < len(projects):
+        data = request.json
+        if "title" in data and "description" in data:
+            projects[project_id]["title"] = data["title"]
+            projects[project_id]["description"] = data["description"]
+            return jsonify({"message": "Project updated successfully"})
+        else:
+            return "Invalid request data", 400
+    else:
+        return "Project not found", 404
+
+@app.route("/projects/<int:project_id>", methods=["DELETE"])
+def delete_project(project_id):
+    if project_id >= 0 and project_id < len(projects):
+       
